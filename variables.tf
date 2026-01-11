@@ -15,9 +15,11 @@ variable "bastion_key_name" {
 }
 
 variable "vpc_id" {
-  type = string
+  description = "Existing VPC ID from Project 1"
+  type        = string
 }
 
 variable "public_subnet_ids" {
-  type = list(string)
+  description = "Existing public subnet IDs from Project 1"
+  type        = list(string)
 }
