@@ -53,3 +53,15 @@ environment      = "dev"
 allowed_ssh_cidr = "YOUR_PUBLIC_IP/32"
 bastion_key_name = "your-existing-keypair-name"
 
+## Stage 2 — Bastion Host 
+This stage deploys a public bastion host for controlled administrative access.
+
+### What’s included
+- Bastion EC2 instance deployed into a public subnet
+- Security group restricts SSH (22) to a trusted CIDR (`allowed_ssh_cidr`)
+- IMDSv2 enforced (`http_tokens = required`)
+- Outputs include the bastion public IP for SSH verification
+
+### Verification
+- Successfully SSH’d into the bastion using the configured key pair
+- Confirmed outbound connectivity from the instance (`curl ifconfig.me`)
