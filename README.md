@@ -15,7 +15,7 @@ Build a **bastion host pattern** for controlled admin access, then deploy **priv
 - Bastion EC2 in a public subnet (restricted SSH)
 - Private EC2 instances in private subnets (no public IPs)
 - Access via:
-  - Bastion SSH → private instances (classic)
+  - Bastion SSH → private instances 
   - Later: AWS SSM Session Manager (preferred production approach)
 
 ---
