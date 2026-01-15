@@ -9,3 +9,10 @@ output "bastion_public_ip" {
 output "bastion_sg_id" {
   value = aws_security_group.bastion_sg.id
 }
+output "private_instance_id" {
+  value = aws_instance.private_ec2.id
+}
+
+output "private_instance_private_ip" {
+  value = aws_instance.private_ec2.private_ip
+}

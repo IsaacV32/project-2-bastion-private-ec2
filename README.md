@@ -65,3 +65,16 @@ This stage deploys a public bastion host for controlled administrative access.
 ### Verification
 - Successfully SSH’d into the bastion using the configured key pair
 - Confirmed outbound connectivity from the instance (`curl ifconfig.me`)
+
+## Stage 3 — Private EC2 + Bastion-only SSH 
+This stage deploys a private EC2 instance with no public IP and restricts SSH access to the bastion host only.
+
+### What’s included
+- Private EC2 deployed into a private subnet (no public IP)
+- Security group allows SSH (22) **only** from the bastion security group
+- IMDSv2 enforced on the private instance
+
+### Verification
+- Direct SSH from laptop → private instance fails (expected)
+- SSH from bastion → private instance succeeds
+- Private instance has outbound access via NAT (e.g. `dnf update` / `curl ifconfig.me`)

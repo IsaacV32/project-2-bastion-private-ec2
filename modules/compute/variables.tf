@@ -27,3 +27,7 @@ variable "bastion_instance_type" {
   type        = string
   default     = "t3.micro"
 }
+variable "private_subnet_ids" {
+  description = "List of private subnet IDs (Multi-AZ)"
+  type        = list(string)
+}
