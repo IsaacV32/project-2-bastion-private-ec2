@@ -72,14 +72,6 @@ resource "aws_security_group" "private_ec2_sg" {
   description = "Private EC2 security group"
   vpc_id      = var.vpc_id
 
-  ingress {
-    description     = "SSH from bastion only"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.bastion_sg.id]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
@@ -97,6 +89,7 @@ resource "aws_instance" "private_ec2" {
   subnet_id              = var.private_subnet_ids[0]
   vpc_security_group_ids = [aws_security_group.private_ec2_sg.id]
   key_name               = var.bastion_key_name
+  iam_instance_profile   = aws_iam_instance_profile.ssm_profile.name
 
   associate_public_ip_address = false
 
@@ -117,4 +110,24 @@ resource "aws_instance" "private_ec2" {
     Name = "${var.project_name}-private-ec2-1"
     Role = "private"
   })
+}
+resource "aws_iam_role" "ssm_role" {
+  name = "${var.project_name}-ssm-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "ec2.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+}
+resource "aws_iam_role_policy_attachment" "ssm_core" {
+  role       = aws_iam_role.ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+resource "aws_iam_instance_profile" "ssm_profile" {
+  name = "${var.project_name}-ssm-profile"
+  role = aws_iam_role.ssm_role.name
 }

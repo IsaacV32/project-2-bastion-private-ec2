@@ -78,3 +78,16 @@ This stage deploys a private EC2 instance with no public IP and restricts SSH ac
 - Direct SSH from laptop → private instance fails (expected)
 - SSH from bastion → private instance succeeds
 - Private instance has outbound access via NAT (e.g. `dnf update` / `curl ifconfig.me`)
+
+## Stage 4 — Secure Access via AWS SSM (No SSH) ✅
+This stage replaces SSH-based access with AWS Systems Manager Session Manager.
+
+### What’s included
+- IAM role + instance profile for SSM
+- Private EC2 registered as a managed instance
+- No inbound SSH rules on private EC2 security group
+- Access controlled via IAM and audited by AWS
+
+### Verification
+- Private EC2 accessible via `aws ssm start-session`
+- No SSH access required or allowed
