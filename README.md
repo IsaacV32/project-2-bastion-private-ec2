@@ -20,7 +20,7 @@ Build a **bastion host pattern** for controlled admin access, then deploy **priv
 
 ---
 
-## Stage 1 — Compute Module Baseline ✅
+## Stage 1 — Compute Module Baseline 
 This stage scaffolds the compute layer as a Terraform module.
 
 ### What’s included
