@@ -101,3 +101,19 @@ This stage replaces SSH-based access to private EC2 instances with **AWS Systems
 - Access via:
   ```bash
   aws ssm start-session --target <private_instance_id>
+
+## Stage 5 — Private EC2 Auto Scaling Group (Launch Template + ASG) ✅
+
+This stage replaces the single private EC2 instance with an Auto Scaling Group across private subnets (Multi-AZ).
+
+### What’s included
+- Launch Template for private instances (Amazon Linux 2023)
+- Auto Scaling Group spanning private subnets
+- IMDSv2 enforced
+- SSM instance profile attached to all ASG instances (no SSH)
+- Scales and self-heals automatically
+
+### Verification
+- ASG launches instances across private subnets
+- Instances register as **Online** in SSM Managed Instances
+- Terminating an instance triggers automatic replacement
