@@ -45,8 +45,9 @@ In real infrastructure repos, modules are built up incrementally. Stage 1 proves
 ---
 
 ## Quickstart
-1) Configure AWS credentials
-2) Create `terraform.tfvars` (not committed) with your values:
+1. Configure AWS credentials (using a named profile locally)
+2. Create `terraform.tfvars` (intentionally not committed) with environment-specific values:
+
 ```hcl
 project_name     = "project-2-bastion-private-ec2"
 environment      = "dev"
@@ -54,7 +55,7 @@ allowed_ssh_cidr = "YOUR_PUBLIC_IP/32"
 bastion_key_name = "your-existing-keypair-name"
 
 ## Stage 2 — Bastion Host 
-This stage deploys a public bastion host for controlled administrative access.
+This stage introduces a public bastion host to enable controlled administrative access while keeping all application instances private.
 
 ### What’s included
 - Bastion EC2 instance deployed into a public subnet
@@ -79,7 +80,7 @@ This stage deploys a private EC2 instance with no public IP and restricts SSH ac
 - SSH from bastion → private instance succeeds
 - Private instance has outbound access via NAT (e.g. `dnf update` / `curl ifconfig.me`)
 
-## Stage 4 — Secure Access via AWS SSM (No SSH) ✅
+## Stage 4 — Secure Access via AWS SSM (No SSH) 
 
 This stage replaces SSH-based access to private EC2 instances with **AWS Systems Manager Session Manager**, aligning with modern production security practices.
 
@@ -102,7 +103,7 @@ This stage replaces SSH-based access to private EC2 instances with **AWS Systems
   ```bash
   aws ssm start-session --target <private_instance_id>
 
-## Stage 5 — Private EC2 Auto Scaling Group (Launch Template + ASG) ✅
+## Stage 5 — Private EC2 Auto Scaling Group (Launch Template + ASG) 
 
 This stage replaces the single private EC2 instance with an Auto Scaling Group across private subnets (Multi-AZ).
 
