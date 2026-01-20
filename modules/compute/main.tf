@@ -83,34 +83,67 @@ resource "aws_security_group" "private_ec2_sg" {
     Name = "${var.project_name}-private-ec2-sg"
   })
 }
-resource "aws_instance" "private_ec2" {
-  ami                    = data.aws_ami.al2023.id
-  instance_type          = "t3.micro"
-  subnet_id              = var.private_subnet_ids[0]
-  vpc_security_group_ids = [aws_security_group.private_ec2_sg.id]
-  key_name               = var.bastion_key_name
-  iam_instance_profile   = aws_iam_instance_profile.ssm_profile.name
+resource "aws_launch_template" "private_lt" {
+  name_prefix   = "${var.project_name}-private-"
+  image_id      = data.aws_ami.al2023.id
+  instance_type = "t3.micro"
 
-  associate_public_ip_address = false
+  vpc_security_group_ids = [aws_security_group.private_ec2_sg.id]
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ssm_profile.name
+  }
 
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
 
-  user_data = <<-EOF
+  user_data = base64encode(<<-EOF
               #!/bin/bash
               set -euo pipefail
               dnf -y update
-              dnf -y install htop
-              echo "Private EC2 ready: $(date)" > /etc/motd
+              echo "ASG instance ready" > /etc/motd
               EOF
+  )
 
-  tags = merge(var.tags, {
-    Name = "${var.project_name}-private-ec2-1"
-    Role = "private"
-  })
+  tag_specifications {
+    resource_type = "instance"
+    tags = merge(var.tags, {
+      Name = "${var.project_name}-private-asg"
+      Role = "private"
+    })
+  }
 }
+resource "aws_autoscaling_group" "private_asg" {
+  name             = "${var.project_name}-private-asg"
+  desired_capacity = 2
+  min_size         = 1
+  max_size         = 3
+
+  vpc_zone_identifier = var.private_subnet_ids
+
+  launch_template {
+    id      = aws_launch_template.private_lt.id
+    version = "$Latest"
+  }
+
+  health_check_type         = "EC2"
+  health_check_grace_period = 60
+
+  tag {
+    key                 = "Name"
+    value               = "${var.project_name}-private-asg"
+    propagate_at_launch = true
+  }
+
+  tag {
+    key                 = "Role"
+    value               = "private"
+    propagate_at_launch = true
+  }
+}
+
 resource "aws_iam_role" "ssm_role" {
   name = "${var.project_name}-ssm-role"
 
