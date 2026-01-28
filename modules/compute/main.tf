@@ -143,6 +143,40 @@ resource "aws_autoscaling_group" "private_asg" {
     propagate_at_launch = true
   }
 }
+resource "aws_cloudwatch_metric_alarm" "asg_high_cpu" {
+  alarm_name          = "${var.project_name}-asg-high-cpu"
+  alarm_description   = "High average CPU usage across private ASG"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 70
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.private_asg.name
+  }
+
+  treat_missing_data = "notBreaching"
+}
+resource "aws_cloudwatch_metric_alarm" "asg_capacity_low" {
+  alarm_name          = "${var.project_name}-asg-capacity-low"
+  alarm_description   = "ASG has fewer in-service instances than desired"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "GroupInServiceInstances"
+  namespace           = "AWS/AutoScaling"
+  period              = 60
+  statistic           = "Minimum"
+  threshold           = 1
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.private_asg.name
+  }
+
+  treat_missing_data = "breaching"
+}
 
 resource "aws_iam_role" "ssm_role" {
   name = "${var.project_name}-ssm-role"
