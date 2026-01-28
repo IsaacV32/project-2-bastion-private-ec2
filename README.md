@@ -17,6 +17,14 @@ Build a **bastion host pattern** for controlled admin access, then deploy **priv
 - Access via:
   - Bastion SSH → private instances 
   - Later: AWS SSM Session Manager (preferred production approach)
+  
+## Architecture Dependency
+
+This project assumes an existing AWS VPC with multi-AZ public and private subnets.
+
+The VPC is provisioned separately in **Project 1 (Production-Grade AWS VPC)** and injected into this project via Terraform variables (`vpc_id`, `public_subnet_ids`, `private_subnet_ids`).
+
+This mirrors real-world infrastructure layering, where foundational network resources are managed independently from compute workloads.
 
 ---
 
